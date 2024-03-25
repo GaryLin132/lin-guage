@@ -1,0 +1,4 @@
+.vscode
+*.exe
+*.h.gch
+/test.c
