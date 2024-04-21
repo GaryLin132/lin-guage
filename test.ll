@@ -1,7 +1,20 @@
-int aaa;
-int b=9;
-aaa=8;
-1+aaa;
+int j = 9;
+int q = 7+6;
+int k = 15;
 
-aaa=9;
-1+aaa;
+if j+2<15:
+{
+	while q<17:
+	{
+		if k>13:
+		{
+			q = q+2;
+		}
+		
+		if k<=13:
+		{
+			q = q+1;
+		}
+		
+	}
+}

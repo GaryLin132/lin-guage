@@ -27,6 +27,11 @@
 #include "body.h"
 #endif
 
+#ifndef _ast_func_
+#define _ast_func_
+#include "ast_func.h"
+#endif
+
 int main(void)
 {
 	FILE *file;
@@ -34,64 +39,30 @@ int main(void)
 	size_t tokenArr_size = 0;
 	file = fopen("test.ll", "r");
 
-	token_arr = lexer(file, &tokenArr_size);
+	token_arr = lexer(&file, &tokenArr_size);
 	fclose(file);
-
-	token_arr[tokenArr_size] = *(token *)malloc(sizeof(token));
-	token_arr[tokenArr_size].type = END_OF_TOKEN;
-	token_arr[tokenArr_size].str = "$";
-	tokenArr_size++;
 
 	print_tokenArr(token_arr);
 
 	// create environment
 	env *init_env = NULL;
 
+	// create the start of AST
+	AST_node *program = create_treeNode('P', 1);
+	program->ptr_arr[0] = create_treeNode('B', 2);
+	AST_node *currBody_ptr = program->ptr_arr[0];
+
 	// start parsing
 	printf("start parsing\n");
 	size_t idx = 0;
-	new_body(init_env, token_arr, &idx);
 
-	/*while(token_arr[idx].type!=END_OF_TOKEN){
-		switch(token_arr[idx].type){
-		case KEYWORD:
-		{
-			if(strcmp(token_arr[idx].str, "int")==0){
-				eat_token(&idx);
-				expect(token_arr[idx], IDENTIFIER, "error: forget variable");
-				if(token_arr[idx+1].type==EQUAL && token_arr[idx+2].type==NUMBER){
-					char* str = token_arr[idx].str;
-					idx+=2;
-					AST_node* root = op2AST(token_arr, &idx);
-					print_asttree(root->ptr_arr[0]);
-					int val = eval_ASTtree(current_env, root->ptr_arr[0]);
-					defineVar(current_env, str, val);
-					free_ASTtree(root);
-				}else if(token_arr[idx+1].type==SEMICOLON){
-					declareVar(current_env, token_arr[idx].str);
-					idx++;
-				}else{
-					printf("invalid variable declaration or definition\n");
-				}
-				eat_token(&idx); //eat up semicolon
-			}else if(strcmp(token_arr[idx].str, "if")==0){
+	new_body(&init_env, token_arr, &idx, currBody_ptr);
+	eval_wholeAST(program);
 
-			}
-			break;
-		}
-		case NUMBER:
-		{
-			AST_node* root = op2AST(token_arr, &idx);
-			print_asttree(root->ptr_arr[0]);
-			printf("ans: %d\n",eval_ASTtree(current_env, root->ptr_arr[0]));
-			free_ASTtree(root);
-			eat_token(&idx); //eat up semicolon
-			break;
-		}
-		}
-	}*/
-
-	exit(100);
+	// free_tokenArr(token_arr);
+	// free_AST(program);
+	printf("done\n");
+	return 5;
 
 	AST_node *root = op2AST(token_arr, &idx);
 	print_asttree(root->ptr_arr[0]);
@@ -110,4 +81,4 @@ int main(void)
 	free_ASTtree(root);
 
 	return 0;
-}
+} 
